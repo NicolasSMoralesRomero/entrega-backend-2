@@ -11,7 +11,7 @@ import websocket from './websocket.js';
 
 const app = express();
 
-const uri = 'mongodb+srv://nicomorales:C0hsHN0Of0oXC5aq@cluster0.rqnge.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const uri = 'ingresar url de archivo config';
 mongoose.connect(uri);
 
 //Handlebars Config
