@@ -7,18 +7,22 @@ const productDB = new productDBManager();
 // Endpoint para obtener todos los productos con paginación y filtro por categoría
 router.get('/', async (req, res) => {
     try {
-        const { limit = 10, page = 1, category = '', sort = '' } = req.query;
+        const { limit = 10, page = 1, category = '', sort = '' } = req.params;
         const params = { limit: parseInt(limit), page: parseInt(page), category, sort };
 
         const result = await productDB.getAllProducts(params);
-        res.json({
-            products: result.products,
+        console.log(result)
+        res.render('products', {
+            title: 'productos',
+            products: result.title,
             hasPrevPage: result.hasPrevPage,
             hasNextPage: result.hasNextPage,
             total: result.total,
             prevLink: result.products.prevLink,
-            nextLink: result.products.nextLink
+            nextLink: result.products.nextLink,
+            limit: parseInt(limit)
         });
+        
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error' });

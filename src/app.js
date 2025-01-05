@@ -1,5 +1,5 @@
 import express from 'express';
-import { engine } from 'express-handlebars';
+import handlebars from 'express-handlebars';
 import {Server} from 'socket.io';
 import mongoose from 'mongoose';
 
@@ -11,12 +11,12 @@ import websocket from './websocket.js';
 
 const app = express();
 
-const uri = 'ingresar url de archivo config';
+const uri = 'mongodb+srv://nicomorales:C0hsHN0Of0oXC5aq@cluster0.rqnge.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(uri);
 
-//Handlebars Config
-app.engine('handlebars', engine({ defaultLayout: 'main' }));
-app.set('views', __dirname + 'views');
+// Configuración Handlebars
+app.engine('handlebars', handlebars.engine());
+app.set('views', __dirname + '/../views');
 app.set('view engine', 'handlebars');
 
 //Middlewares

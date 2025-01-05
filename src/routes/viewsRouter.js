@@ -3,36 +3,11 @@ import productDBManager from '../dao/productDBManager.js';
 import { cartDBManager } from '../dao/cartDBManager.js';
 
 const router = Router();
+const productDB = new productDBManager();
 const ProductService = new productDBManager();
 const CartService = new cartDBManager(ProductService);
 
 // Rutas para vistas
-
-
-router.get('/products', async (req, res) => {
-    const { limit = 10, page = 1 } = req.query;
-
-    try {
-        const products = await ProductService.getAllProducts(req.query)
-
-        const totalProducts = await ProductService.getAllProducts(req.query)
-        const hasPrevPage = page > 1;
-        const hasNextPage = (page * limit) < totalProducts;
-
-        res.render('products', {
-            title: 'Lista de Productos',
-            products,
-            hasPrevPage,
-            hasNextPage,
-            prevPage: page - 1,
-            nextPage: page + 1,
-            limit: parseInt(limit)
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-    }
-});
 
 router.get('/products/:pid', async (req, res) => {
     try {
@@ -59,7 +34,24 @@ router.get('/products/:pid', async (req, res) => {
     }
 });
 
-router.get('/realtimeproducts', (req, res) => {
-    res.render('realTimeProducts', { title: 'Real Time Products' });
+router.get('/', async (req, res) => {
+    try {
+        const products = await ProductService.getAllProducts(req.query);
+        let cart = await CartService.getAllCarts();
+
+        if (!cart) {
+            cart = new createCart();
+            await cart.save();
+        }
+
+        res.render('home', {
+            title: 'Home',
+            products,
+            cartProducts: cart.products
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+    }
 });
 export default router;
