@@ -9,7 +9,7 @@ const CartService = new cartDBManager(ProductService);
 // Crear un nuevo carrito
 router.post('/', async (req, res) => {
     try {
-        const newCart = await cartService.createCart();
+        const newCart = await CartService.createCart();
         res.status(201).json({
             status: 'success',
             payload: newCart
@@ -40,7 +40,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
     const { cid, pid } = req.params;
     const { quantity } = req.body;
     try {
-        const products = await CartService.addProductToCart(cid, pid, quantity);
+        const products = await CartService.addProductByID(cid, pid, quantity);
         res.json({
             status: 'success',
             payload: products
@@ -55,7 +55,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
 router.delete('/:cid/product/:pid', async (req, res) => {
     const { cid, pid } = req.params;
     try {
-        const products = await CartService.deleteProductFromCart(cid, pid);
+        const products = await CartService.deleteProductByID(cid, pid);
         res.json({
             status: 'success',
             payload: products
@@ -71,7 +71,7 @@ router.put('/:cid/product/:pid', async (req, res) => {
     const { cid, pid } = req.params;
     const { quantity } = req.body;
     try {
-        const products = await CartService.updateProductInCart(cid, pid, quantity);
+        const products = await CartService.updateProductByID(cid, pid, quantity);
         res.json({
             status: 'success',
             payload: products
@@ -86,7 +86,7 @@ router.put('/:cid/product/:pid', async (req, res) => {
 router.delete('/:cid', async (req, res) => {
     const { cid } = req.params;
     try {
-        const products = await CartService.deleteAllProductsFromCart(cid);
+        const products = await CartService.deleteAllProducts(cid);
         res.json({
             status: 'success',
             payload: products

@@ -9,31 +9,6 @@ const CartService = new cartDBManager(ProductService);
 
 // Rutas para vistas
 
-router.get('/products/:pid', async (req, res) => {
-    try {
-        const product = await ProductService.getProductByID(req.query)
-        if (product) {
-            const productData = {
-                _id: product._id,
-                title: product.title,
-                description: product.description,
-                price: product.price,
-                stock: product.stock,
-                category: product.category
-            };
-            res.render('productDetail', {
-                title: product.title,
-                product: productData
-            });
-        } else {
-            res.status(404).send('Producto no encontrado');
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
 router.get('/', async (req, res) => {
     try {
         const products = await ProductService.getAllProducts(req.query);

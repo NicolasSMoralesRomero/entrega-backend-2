@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
         const params = { limit: parseInt(limit), page: parseInt(page), category, sort };
 
         const result = await productDB.getAllProducts(params);
-        console.log(result)
+        
         res.render('products', {
             title: 'productos',
             products: result.title,
@@ -32,11 +32,27 @@ router.get('/', async (req, res) => {
 // Endpoint para obtener un producto por ID
 router.get('/:pid', async (req, res) => {
     try {
-        const product = await productDB.getProductByID(req.params.pid);
-        res.json(product);
+        const product = await productDB.getProductByID(req.params.pid)
+        
+        if (product) {
+            const productData = {
+                _id: product._id,
+                title: product.title,
+                description: product.description,
+                price: product.price,
+                stock: product.stock,
+                category: product.category
+            };
+            res.render('productDetail', {
+                title: product.title,
+                product: productData
+            });
+        } else {
+            res.status(404).send('Producto no encontrado');
+        }
     } catch (err) {
         console.error(err);
-        res.status(404).json({ error: err.message });
+        res.status(500).send('Internal Server Error');
     }
 });
 

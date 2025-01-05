@@ -31,6 +31,10 @@
                     alert(error.message);
                 });
         }
+
+        function getBack() {
+            window.location.href = `/api/products/`;
+        }
     </script>
 </head>
 
@@ -42,7 +46,7 @@
     <p>Categoría: {{product.category}}</p>
 
     <button onclick="addToCart('{{product._id}}')">Agregar al carrito</button>
-    <button onclick="window.history.back()">Volver a la lista de productos</button>
+    <button onclick="getBack()">Volver</button>
 </body>
 
 </html>
