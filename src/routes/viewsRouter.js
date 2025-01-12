@@ -14,6 +14,9 @@ router.get('/', async (req, res) => {
         const products = await ProductService.getAllProducts(req.query);
         let cart = await CartService.getAllCarts();
 
+        //sessions
+        const isSession = req.session.user ? true : false;
+
         if (!cart) {
             cart = new createCart();
             await cart.save();
@@ -22,11 +25,13 @@ router.get('/', async (req, res) => {
         res.render('home', {
             title: 'Home',
             products,
-            cartProducts: cart.products
+            cartProducts: cart.products,
+            isSession,
         });
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal Server Error');
     }
 });
+
 export default router;

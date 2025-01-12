@@ -27,7 +27,7 @@ router.get('/:cid', async (req, res) => {
     try {
         const cart = await CartService.getProductsFromCartByID(cid);
 
-        console.log(cart)
+        //console.log(cart)
 
         if (!cart) {
             return res.status(404).send('Carrito no encontrado');

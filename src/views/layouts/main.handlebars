@@ -10,11 +10,26 @@
 <body>
     <header>
         <nav>
-            <ul>
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/api/products">Productos</a></li>
-                <li><a href="/api/carts/670457eadbee7b2e09aacd6f">Carrito</a></li>
-            </ul>
+            {{#if isSession}}
+            <div>
+                <ul>
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/api/products">Productos</a></li>
+                    <li><a href="/api/carts/670457eadbee7b2e09aacd6f">Carrito</a></li>
+                    <li><a href="/api/sessions/profile">Perfil</a></li>
+
+                </ul>
+            </div>
+            {{else}}
+            <div>
+                <ul>
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/api/products">Productos</a></li>
+                    <li><a href="/api/sessions/login">Iniciar Sesión</a></li>
+                    <li><a href="/api/sessions/register">Registrese</a></li>
+                </ul>
+            </div>
+            {{/if}}
         </nav>
     </header>
     <main>

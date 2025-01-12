@@ -1,0 +1,22 @@
+<head>
+    <script>
+        function logOut() {
+            window.location.href = `/api/sessions/logout`;
+        }
+    </script>
+</head>
+
+<div class="card text-bg-primary m-3">
+  <div class="card-header">
+    <h1> Perfil del usuario </h1>
+  </div>
+  <div class="card-body">
+
+    <ul>
+      <li>{{user.first_name}} {{user.last_name}} </li>
+      <li> {{user.age}} </li>
+      <li>{{user.email}} </li>
+    </ul>
+
+    <button onclick="logOut()">Cerrar sesión</button>
+  </div>
