@@ -11,7 +11,7 @@ class cartDBManager {
     }
 
     async getProductsFromCartByID(cid) {
-        const cart = await cartsModel.findOne({ _id: cid }).populate('products.product');
+        const cart = await cartsModel.findOne({ _id: cid }).populate('products.productId');
 
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
         
@@ -28,7 +28,7 @@ class cartDBManager {
         const cart = await cartsModel.findOne({ _id: cid });
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
 
-        let productIndex = cart.products.findIndex(item => item.product === pid);
+        let productIndex = cart.products.findIndex(item => item.productId === pid);
         
         if (productIndex >= 0) {
             cart.products[productIndex].quantity += 1;
