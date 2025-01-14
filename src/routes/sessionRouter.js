@@ -5,6 +5,8 @@ import passport from "passport";
 
 export const sessionRoutes = Router();
 
+//endpoints register y login "local"
+
 sessionRoutes.post(
   "/login",
   passport.authenticate("login", {
@@ -61,7 +63,26 @@ sessionRoutes.get("/logout", (req, res) => {
   res.redirect("/")
 });
 
-// Rutas para login y register
+// Endpoint login con Github
+
+sessionRoutes.get("/github", passport.authenticate("github"));
+
+sessionRoutes.get(
+  "/github-callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  (req, res) => {
+    console.log(req.user);
+
+    if (req.user) {
+      req.session.user = req.user;
+      return res.redirect("/");
+    }
+
+    res.redirect("/login");
+  }
+);
+
+// Rutas para login y register local
 
 sessionRoutes.get("/login", (req, res) => {
     const isSession = req.session.user ? true : false;

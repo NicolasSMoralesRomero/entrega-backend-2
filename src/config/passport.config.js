@@ -3,6 +3,12 @@ import local from "passport-local";
 import { userModel } from "../dao/models/userModel.js";
 import { comparePassword, hashPassword } from "../utils/hash.js";
 
+import GithubStrategy from "passport-github2";
+
+//Pasar a archivo .env despues de pre entrega
+const GITHUB_CLIENT_ID = "";
+const GITHUB_CLIENT_SECRET = "";
+
 const LocalStrategy = local.Strategy;
 
 export function initializePassport() {
@@ -70,6 +76,44 @@ export function initializePassport() {
       }
     )
   );
+
+   // Estrategia Github
+   passport.use(
+    "github",
+    new GithubStrategy(
+      {
+        clientID: GITHUB_CLIENT_ID,
+        clientSecret: GITHUB_CLIENT_SECRET,
+        callbackURL: "http://localhost:8080/api/sessions/github-callback",
+        scope: ["user:email"],
+      },
+      async (accessToken, refreshToken, profile, done) => {
+
+        try {
+          const email = profile.emails[0].value;
+
+          const user = await userModel.findOne({ email });
+
+          if (user) {
+            done(null, user);
+            return;
+          }
+
+          const newUser = await userModel.create({
+            first_name: profile.displayName,
+            email,
+            age: profile.age || 18,
+            githubId: profile.id,
+          });
+
+          done(null, newUser);
+        } catch (error) {
+          done(error);
+        }
+      }
+    )
+  );
+
 
   passport.serializeUser((user, done) => {
     done(null, user._id);

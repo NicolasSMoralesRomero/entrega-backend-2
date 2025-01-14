@@ -6,22 +6,21 @@ const userSchema = new Schema({
     required: true,
   },
   last_name: {
-    type: String,
-    required: true,
+    type: String
   },
   age: {
     type: Number,
     required: true,
   },
   password: {
-    type: String,
-    required: true,
+    type: String
   },
   email: {
     type: String,
     required: true,
     unique: true,
   },
+  githubId: { type: String },
 });
 
 export const userModel = model("user", userSchema);
