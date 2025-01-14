@@ -21,6 +21,15 @@ const userSchema = new Schema({
     unique: true,
   },
   githubId: { type: String },
+   cartId: {
+     type: Schema.Types.ObjectId,
+    ref: "cart",
+   },
+  role: {
+    type: String,
+    enum: ["admin", "user"],
+    default: "user",
+  },
 });
 
 export const userModel = model("user", userSchema);

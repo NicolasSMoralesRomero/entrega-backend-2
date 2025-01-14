@@ -1,13 +1,18 @@
 import passport from "passport";
 import local from "passport-local";
+import GithubStrategy from "passport-github2";
+import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 import { userModel } from "../dao/models/userModel.js";
 import { comparePassword, hashPassword } from "../utils/hash.js";
 
-import GithubStrategy from "passport-github2";
+
+import { createToken, SECRET } from "../utils/jwtUtil.js";
+
 
 //Pasar a archivo .env despues de pre entrega
 const GITHUB_CLIENT_ID = "";
 const GITHUB_CLIENT_SECRET = "";
+
 
 const LocalStrategy = local.Strategy;
 
@@ -53,8 +58,9 @@ export function initializePassport() {
     new LocalStrategy(
       {
         usernameField: "email",
+        passReqToCallback: true,
       },
-      async (email, password, done) => {
+      async ( req, email, password, done) => {
         try {
           const user = await userModel.findOne({ email });
 
@@ -69,9 +75,40 @@ export function initializePassport() {
           if (!isPasswordValid)
             return done(null, false, { message: "Invalid password" });
 
+          const token = createToken({
+            id: user.id,
+            email: user.email,
+            role: user.role,
+          });
+
+          req.token = token;
+
+
           return done(null, user);
         } catch (error) {
           return done(`Hubo un error: ${error}`);
+        }
+      }
+    )
+  );
+
+  //JWT
+  passport.use(
+    "jwt",
+    new JWTStrategy(
+      {
+        secretOrKey: SECRET,
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+      },
+      async (payload, done) => {
+        try {
+          const user = await userModel.findById(payload.id);
+
+          if (!user) return done(null, false);
+
+          return done(null, user);
+        } catch (error) {
+          return done(error);
         }
       }
     )
@@ -124,4 +161,8 @@ export function initializePassport() {
 
     done(null, user);
   });
+}
+
+function cookieExtractor(req) {
+  return req && req.cookies ? req.cookies.token : null;
 }

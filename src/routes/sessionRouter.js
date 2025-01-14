@@ -10,13 +10,20 @@ export const sessionRoutes = Router();
 sessionRoutes.post(
   "/login",
   passport.authenticate("login", {
-    failureRedirect: "/api/sessions/fail-login",
+    failureRedirect: "/api/sessions/fail-login"
   }),
   async (req, res) => {
     if (!req.user)
       return res
         .status(401)
         .json({ message: "Unauthorized", details: req.authInfo });
+
+        const token = req.token;
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
 
     req.session.user = {
       first_name: req.user.first_name,
@@ -27,7 +34,20 @@ sessionRoutes.post(
 
     //res.status(200).json({ message: "User logged in", user: req.session.user });
     //Si inicia sesión redirect a ruta raíz
-    res.redirect("/")
+    res
+    .redirect("/")
+  }
+);
+
+// Endpoint "current"
+sessionRoutes.get(
+  "/current",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.json({
+      message: "Current user",
+      token: req.user,
+    });
   }
 );
 
@@ -39,9 +59,7 @@ sessionRoutes.get("/fail-login", (req, res) => {
 
 sessionRoutes.post(
   "/register",
-  passport.authenticate("register", {
-    failureRedirect: "/api/sessions/fail-register",
-  }),
+  passport.authenticate("register", { failureRedirect: "/api/sessions/fail-register" }),
   (req, res) => {
     if (!req.user)
       return res
