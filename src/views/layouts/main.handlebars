@@ -5,39 +5,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
+    <!-- Enlace a Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
     <header>
-        <nav>
-            {{#if isSession}}
-            <div>
-                <ul>
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/api/products">Productos</a></li>
-                    <li><a href="/api/carts/670457eadbee7b2e09aacd6f">Carrito</a></li>
-                    <li><a href="/api/sessions/profile">Perfil</a></li>
-
-                </ul>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="/">Tienda</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    {{#if isSession}}
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/products">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/carts/670457eadbee7b2e09aacd6f">Carrito</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/sessions/profile">Perfil</a>
+                        </li>
+                    </ul>
+                    {{else}}
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/products">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/sessions/login">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/sessions/register">Regístrate</a>
+                        </li>
+                    </ul>
+                    {{/if}}
+                </div>
             </div>
-            {{else}}
-            <div>
-                <ul>
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/api/products">Productos</a></li>
-                    <li><a href="/api/sessions/login">Iniciar Sesión</a></li>
-                    <li><a href="/api/sessions/register">Registrese</a></li>
-                </ul>
-            </div>
-            {{/if}}
         </nav>
     </header>
-    <main>
+
+    <main class="container mt-4">
         {{{body}}}
     </main>
-    <footer>
-        <p>&copy; 2024 Tienda</p>
+
+    <footer class="bg-light text-center py-4 mt-5">
+        <p>&copy; 2024 Tienda. Todos los derechos reservados.</p>
     </footer>
+
+    <!-- Scripts de Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

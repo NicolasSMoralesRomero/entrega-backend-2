@@ -7,8 +7,7 @@
     <title>Productos en Tiempo Real</title>
     <script src="/socket.io/socket.io.js"></script>
 
-    <!-- No pude colocar el codigo js en un arhivo aparte, para verificar estructura handlebars ir a linea 152 -->
-
+    
     <script>
         let currentPage = 1;
         const limit = 10;
@@ -51,7 +50,7 @@
             socket.on('updateProducts', ({ products, hasPrevPage, hasNextPage }) => {
                 const productList = document.getElementById('productList');
                 productList.innerHTML = products.map(product =>
-                    `<li>
+                    `<li class="list-group-item">
                     ${product.title || 'Sin nombre'} - ${product.price} 
                     <button onclick="addToCart('${product._id}')">Agregar al carrito</button>
                     <button onclick="showDetails('${product._id}')">Mostrar más</button>
@@ -150,43 +149,63 @@
 </head>
 
 <body>
-    <h1>Productos en Tiempo Real</h1>
+    <div class="container mt-5">
+        <h1 class="text-center">Productos en Tiempo Real</h1>
 
-    <h2>¡Crea tus productos!</h2>
-    <form id="productForm">
-        <input type="text" name="title" placeholder="Título" required>
-        <textarea name="description" placeholder="Descripción" required></textarea>
-        <input type="number" name="price" placeholder="Precio" required>
-        <input type="number" name="stock" placeholder="Stock" required min="0">
-        <input type="text" name="category" placeholder="Categoría" required>
-        <button type="submit">Agregar producto</button>
-    </form>
+        <h2 class="mt-4">¡Crea tus productos!</h2>
+        <form id="productForm" class="mb-4">
+            <div class="form-group">
+                <input type="text" name="title" placeholder="Título" required class="form-control">
+            </div>
+            <div class="form-group">
+                <textarea name="description" placeholder="Descripción" required class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="number" name="price" placeholder="Precio" required class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="number" name="stock" placeholder="Stock" required min="0" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="text" name="category" placeholder="Categoría" required class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Agregar producto</button>
+        </form>
 
-    <label for="categorySelect">Filtrar por categoría:</label>
-    <select id="categorySelect">
-        <option value="">Todas</option>
-        <option value="Tecnologia">Tecnología</option>
-        <option value="Relojes">Relojes</option>
-        <option value="Ropa">Ropa</option>
-        <option value="Hogar">Hogar</option>
-    </select>
+        <div class="form-group">
+            <label for="categorySelect">Filtrar por categoría:</label>
+            <select id="categorySelect" class="form-control">
+                <option value="">Todas</option>
+                <option value="Tecnologia">Tecnología</option>
+                <option value="Relojes">Relojes</option>
+                <option value="Ropa">Ropa</option>
+                <option value="Hogar">Hogar</option>
+            </select>
+        </div>
 
-    <label for="sortSelect">Ordenar por:</label>
-    <select id="sortSelect">
-        <option value="title">Nombre</option>
-        <option value="price">Precio</option>
-    </select>
+        <div class="form-group">
+            <label for="sortSelect">Ordenar por:</label>
+            <select id="sortSelect" class="form-control">
+                <option value="title">Nombre</option>
+                <option value="price">Precio</option>
+            </select>
+        </div>
 
-    <label for="orderSelect">Orden:</label>
-    <select id="orderSelect">
-        <option value="asc">Ascendente: A - Z // Precio menor</option>
-        <option value="desc">Descendente: Z - A // Precio mayor</option>
-    </select>
+        <div class="form-group">
+            <label for="orderSelect">Orden:</label>
+            <select id="orderSelect" class="form-control">
+                <option value="asc">Ascendente: A - Z // Precio menor</option>
+                <option value="desc">Descendente: Z - A // Precio mayor</option>
+            </select>
+        </div>
 
-    <ul id="productList"></ul>
+        <ul id="productList" class="list-group mt-4"></ul>
 
-    <button id="prevButton" disabled>Página Anterior</button>
-    <button id="nextButton" disabled>Página Siguiente</button>
+        <div class="d-flex justify-content-between mt-4">
+            <button id="prevButton" class="btn btn-secondary" disabled>Página Anterior</button>
+            <button id="nextButton" class="btn btn-secondary" disabled>Página Siguiente</button>
+        </div>
+    </div>
 </body>
 
 </html>

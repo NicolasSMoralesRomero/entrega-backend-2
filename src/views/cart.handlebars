@@ -8,24 +8,31 @@
 </head>
 
 <body>
-    <h1>Productos en el Carrito</h1>
-    <div id="cartItems">
+    <h1 class="text-center mt-5">Productos en el Carrito</h1>
+    <div id="cartItems" class="mt-4">
         {{#each cart}}
-        <div class="cart-item">
-            <span>{{this.title}} - Cantidad: {{this.quantity}}</span>
-            <div>
-                <button onclick="updateQuantity('{{this.productId}}', 1)">+</button>
-                <button onclick="updateQuantity('{{this.productId}}', -1)">-</button>
-                <button onclick="removeFromCart('{{this.productId}}')">Eliminar</button>
+        <div class="cart-item mb-3 p-3 border rounded">
+            <div class="d-flex justify-content-between">
+                <span>{{this.title}} - Cantidad: {{this.quantity}}</span>
+                <div>
+                    <button onclick="updateQuantity('{{this.productId}}', 1)" class="btn btn-success btn-sm">+</button>
+                    <button onclick="updateQuantity('{{this.productId}}', -1)" class="btn btn-warning btn-sm">-</button>
+                    <button onclick="removeFromCart('{{this.productId}}')"
+                        class="btn btn-danger btn-sm">Eliminar</button>
+                </div>
             </div>
         </div>
         {{/each}}
     </div>
-    <div class="total">
-        Total: {{total}}
+
+    <div class="total mt-4 p-3 border rounded">
+        <h3>Total: {{total}}</h3>
     </div>
-    <button onclick="clearCart()">Vaciar Carrito</button>
-    <a href="/api/products">Volver a la tienda</a>
+
+    <div class="mt-4">
+        <button onclick="clearCart()" class="btn btn-danger w-100 mb-3">Vaciar Carrito</button>
+        <a href="/api/products" class="btn btn-primary w-100">Volver a la tienda</a>
+    </div>
 
     <script>
         function updateQuantity(productId, change) {
