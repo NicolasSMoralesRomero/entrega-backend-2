@@ -10,8 +10,8 @@ import { createToken, SECRET } from "../utils/jwtUtil.js";
 
 
 //Pasar a archivo .env despues de pre entrega
-const GITHUB_CLIENT_ID = "Iv23liAYgopAjBa1s2CQ";
-const GITHUB_CLIENT_SECRET = "758026f7f257963232bd64b0e85b7b04abb2d0bc";
+const GITHUB_CLIENT_ID = "";
+const GITHUB_CLIENT_SECRET = "";
 
 const LocalStrategy = local.Strategy;
 
