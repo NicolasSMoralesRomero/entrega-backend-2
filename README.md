@@ -43,3 +43,6 @@ Contraseña: 12345
 #
 Email: cindy@gmail.com
 Contraseña: 12345
+
+⚠️ **Advertencia:**  
+A veces cuando recién se inició el servidor y se intenta iniciar sesión, la página no carga. Ingresar nuevamente a http://localhost:8080/ y volver a hacer el login. 
