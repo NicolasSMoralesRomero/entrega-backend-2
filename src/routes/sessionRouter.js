@@ -46,7 +46,12 @@ sessionRoutes.get(
   (req, res) => {
     res.json({
       message: "Current user",
-      token: req.user,
+      token: {
+        first_name: req.user.first_name,
+        last_name: req.user.last_name,
+        email: req.user.email,
+        age: req.user.age,
+      },
     });
   }
 );
@@ -66,7 +71,8 @@ sessionRoutes.post(
         .status(500)
         .json({ message: "Internal server error", details: req.authInfo });
 
-    return res.status(201).json({ message: "User created", user: req.user });
+    // return res.status(201).json({ message: "User created", user: req.user });
+    return res.redirect("/")
   }
 );
 
