@@ -15,9 +15,11 @@
             <div class="d-flex justify-content-between">
                 <span>{{this.title}} - Cantidad: {{this.quantity}}</span>
                 <div>
-                    <button onclick="updateQuantity('{{this.productId}}', 1)" class="btn btn-success btn-sm">+</button>
-                    <button onclick="updateQuantity('{{this.productId}}', -1)" class="btn btn-warning btn-sm">-</button>
-                    <button onclick="removeFromCart('{{this.productId}}')"
+                    <button onclick="updateQuantity('{{this.productId._id}}', 1)"
+                        class="btn btn-success btn-sm">+</button>
+                    <button onclick="updateQuantity('{{this.productId._id}}', -1)"
+                        class="btn btn-warning btn-sm">-</button>
+                    <button onclick="removeFromCart('{{this.productId._id}}')"
                         class="btn btn-danger btn-sm">Eliminar</button>
                 </div>
             </div>

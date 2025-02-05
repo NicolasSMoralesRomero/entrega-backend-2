@@ -10,12 +10,13 @@ class cartDBManager {
         return cartsModel.find();
     }
 
+    // Obtener los productos del carrito por su ID
     async getProductsFromCartByID(cid) {
-        const cart = await cartsModel.findOne({ _id: cid }).populate('products.productId');
+        const cart = await cartsModel.findOne({ _id: cid }).populate('products.productId');  // Aquí se hace el populate
 
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
-        
-        return cart;
+
+        return cart;  // Retorna el carrito con los productos poblados
     }
 
     async createCart() {
@@ -29,13 +30,13 @@ class cartDBManager {
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
 
         let productIndex = cart.products.findIndex(item => item.productId === pid);
-        
+
         if (productIndex >= 0) {
             cart.products[productIndex].quantity += 1;
         } else {
-            cart.products.push({ product: pid, quantity: 1 });
+            cart.products.push({ productId: pid, quantity: 1 });
         }
-        
+
         await cartsModel.updateOne({ _id: cid }, { products: cart.products });
         return await this.getProductsFromCartByID(cid);
     }

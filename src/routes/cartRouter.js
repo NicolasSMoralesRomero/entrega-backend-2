@@ -26,33 +26,28 @@ router.get('/:cid', async (req, res) => {
     
     try {
         const cart = await CartService.getProductsFromCartByID(cid);
-
-        //console.log(cart)
-
-        if (!cart) {
-            return res.status(404).send('Carrito no encontrado');
-        }
-
+        
         const cartProducts = cart.products.map(item => ({
-            productId: item._id,
-            title: item.id, //tengo el id, pero necesito "acceder a BD productos para decodificar el nombre en base al id, lo mismo con precio"
+            productId: item.productId._id,  // Asegúrate de que 'productId' esté poblado
+            title: item.productId.title,    // Accede a 'title' de 'productId'
             quantity: item.quantity,
-            price: item.price
+            price: item.productId.price     // Accede al 'price' de 'productId'
         }));
 
-        // Calcular el total
+        // Calcular el total del carrito
         const total = cartProducts.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
         res.render('cart', {
-            cart: cartProducts,
-            total: total
+            cart: cartProducts,   // Los productos con sus detalles
+            total: total          // El total calculado
         });
-       
+
     } catch (err) {
         console.error(err);
         res.status(400).json({ status: 'error', message: err.message });
     }
 });
+
 
 // Agregar un producto a un carrito específico
 router.post('/:cid/product/:pid', async (req, res) => {
