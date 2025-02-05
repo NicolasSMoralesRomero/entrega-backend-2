@@ -7,7 +7,7 @@
     <title>Productos en Tiempo Real</title>
     <script src="/socket.io/socket.io.js"></script>
 
-    
+
     <script>
         let currentPage = 1;
         const limit = 10;
@@ -95,13 +95,28 @@
 
                 const title = event.target.title.value;
                 const description = event.target.description.value;
-                const price = event.target.price.value;
-                const stock = event.target.stock.value;
+                const price = parseFloat(event.target.price.value);  // Asegúrate de que sea un número
+                const stock = parseInt(event.target.stock.value, 10);  // Asegúrate de que sea un número entero
                 const category = event.target.category.value;
 
-                socket.emit('addProduct', { title, description, price, stock, category });
+                // Verifica si los valores de price y stock son válidos
+                if (isNaN(price) || isNaN(stock)) {
+                    alert("Por favor ingresa valores válidos para precio y stock.");
+                    return;
+                }
+
+                socket.emit('createProduct', { title, description, price, stock, category });
+
+                // Escuchar el evento 'productCreated' y mostrar el mensaje
+                socket.on('productCreated', (data) => {
+                    if (data.success) {
+                        alert(data.message);  // Muestra un mensaje de éxito
+                    }
+                });
+
                 event.target.reset();
             });
+
 
             prevButton.addEventListener('click', () => {
                 if (currentPage > 1) {

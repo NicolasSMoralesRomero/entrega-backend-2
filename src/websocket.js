@@ -9,12 +9,12 @@ export default (io) => {
         // Obtener productos con paginación, filtros y orden
         socket.on('getProducts', async ({ page = 1, limit = 10, category, sortBy = 'title', sortOrder = 'asc' }) => {
             try {
-                const { products, hasPrevPage, hasNextPage } = await productService.getAllProducts({ 
-                    page, 
-                    limit, 
-                    category, 
-                    sortBy, 
-                    sortOrder 
+                const { products, hasPrevPage, hasNextPage } = await productService.getAllProducts({
+                    page,
+                    limit,
+                    category,
+                    sortBy,
+                    sortOrder
                 });
                 socket.emit('updateProducts', { products, hasPrevPage, hasNextPage });
             } catch (error) {
@@ -26,8 +26,8 @@ export default (io) => {
         socket.on('filterProducts', async ({ category, page = 1, limit = 10 }) => {
             try {
                 const { products, hasPrevPage, hasNextPage } = await productService.getAllProducts({
-                    page, 
-                    limit, 
+                    page,
+                    limit,
                     category
                 });
                 socket.emit('updateProducts', { products, hasPrevPage, hasNextPage });
@@ -42,6 +42,9 @@ export default (io) => {
                 await productService.createProduct(data);
                 const { products } = await productService.getAllProducts({});  // Obtener productos después de crear uno nuevo
                 io.emit('updateProducts', { products });
+
+                // Emitir un evento de éxito al cliente que ha creado el producto
+                socket.emit('productCreated', { success: true, message: 'Producto creado exitosamente.' });
             } catch (error) {
                 socket.emit('statusError', error.message);
             }

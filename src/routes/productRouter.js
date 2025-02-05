@@ -66,6 +66,8 @@ router.post('/', async (req, res) => {
 
     try {
         const newProduct = await productDB.createProduct(req.body);
+        console.log(newProduct);
+        
         res.status(201).json(newProduct);
     } catch (err) {
         console.error(err);
