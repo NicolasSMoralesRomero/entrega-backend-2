@@ -36,53 +36,57 @@
         <a href="/api/products" class="btn btn-primary w-100">Volver a la tienda</a>
     </div>
 
-    <script>
-        function updateQuantity(productId, change) {
-            fetch(`/api/carts/670457eadbee7b2e09aacd6f/products/${productId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ quantity: change })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Cantidad actualizada');
-                        location.reload();
-                    } else {
-                        alert('Error al actualizar la cantidad');
-                    }
-                });
-        }
+<script>
+    const cid = '{{cid}}';  // Se inyecta el ID del carrito
+    
+    function updateQuantity(productId, change) {
+        fetch(`/api/carts/${cid}/product/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity: change })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Cantidad actualizada');
+                location.reload();
+            } else {
+                alert('Error al actualizar la cantidad');
+            }
+        });
+    }
 
-        function removeFromCart(productId) {
-            fetch(`/api/carts/670457eadbee7b2e09aacd6f/products/${productId}`, {
-                method: 'DELETE'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Producto eliminado del carrito');
-                        location.reload();
-                    } else {
-                        alert('Error al eliminar el producto del carrito');
-                    }
-                });
-        }
+    function removeFromCart(productId) {
+        fetch(`/api/carts/${cid}/product/${productId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Producto eliminado');
+                location.reload();
+            } else {
+                alert('Error al eliminar el producto');
+            }
+        });
+    }
 
-        function clearCart() {
-            fetch(`/api/carts/670457eadbee7b2e09aacd6f/products`, {
-                method: 'DELETE'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Carrito vacío');
-                        location.reload();
-                    } else {
-                        alert('Error al vaciar el carrito');
-                    }
-                });
-        }
-    </script>
+    function clearCart() {
+        fetch(`/api/carts/${cid}/products`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Carrito vacío');
+                location.reload();
+            } else {
+                alert('Error al vaciar el carrito');
+            }
+        });
+    }
+</script>
 </body>
 
 </html>

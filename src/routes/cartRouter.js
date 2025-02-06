@@ -28,18 +28,18 @@ router.get('/:cid', async (req, res) => {
         const cart = await CartService.getProductsFromCartByID(cid);
         
         const cartProducts = cart.products.map(item => ({
-            productId: item.productId._id,  // Asegúrate de que 'productId' esté poblado
-            title: item.productId.title,    // Accede a 'title' de 'productId'
+            productId: item.productId._id,
+            title: item.productId.title,
             quantity: item.quantity,
-            price: item.productId.price     // Accede al 'price' de 'productId'
+            price: item.productId.price
         }));
 
-        // Calcular el total del carrito
         const total = cartProducts.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
         res.render('cart', {
-            cart: cartProducts,   // Los productos con sus detalles
-            total: total          // El total calculado
+            cart: cartProducts,
+            total: total,
+            cid: cid  // <-- Agregado aquí
         });
 
     } catch (err) {
@@ -47,6 +47,7 @@ router.get('/:cid', async (req, res) => {
         res.status(400).json({ status: 'error', message: err.message });
     }
 });
+
 
 
 // Agregar un producto a un carrito específico
@@ -85,10 +86,10 @@ router.put('/:cid/product/:pid', async (req, res) => {
     const { cid, pid } = req.params;
     const { quantity } = req.body;
     try {
-        const products = await CartService.updateProductByID(cid, pid, quantity);
+        const updatedCart = await CartService.updateProductByID(cid, pid, quantity);  // Llamar a la función de actualización
         res.json({
             status: 'success',
-            payload: products
+            payload: updatedCart  // Devolver el carrito actualizado
         });
     } catch (err) {
         console.error(err);
@@ -96,14 +97,15 @@ router.put('/:cid/product/:pid', async (req, res) => {
     }
 });
 
-// Eliminar todos los productos de un carrito
-router.delete('/:cid', async (req, res) => {
+
+// Vaciar todo el carrito
+router.delete('/:cid/products', async (req, res) => {
     const { cid } = req.params;
     try {
-        const products = await CartService.deleteAllProducts(cid);
+        const updatedCart = await CartService.deleteAllProducts(cid);
         res.json({
             status: 'success',
-            payload: products
+            payload: updatedCart
         });
     } catch (err) {
         console.error(err);
