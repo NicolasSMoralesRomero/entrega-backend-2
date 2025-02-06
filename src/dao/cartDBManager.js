@@ -48,7 +48,7 @@ class cartDBManager {
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
     
         // Filtrar el producto que debe ser eliminado
-        const newProducts = cart.products.filter(item => item.productId.toString() !== pid);  // Cambiar 'product' a 'productId'
+        const newProducts = cart.products.filter(item => item.productId.toString() !== pid);
     
         // Actualizar el carrito
         await cartsModel.updateOne({ _id: cid }, { products: newProducts });
@@ -67,26 +67,35 @@ class cartDBManager {
         return await this.getProductsFromCartByID(cid);
     }
 
-    async updateProductByID(cid, pid, quantity) {
-        if (!quantity || isNaN(parseInt(quantity))) throw new Error('La cantidad ingresada no es válida!');
-    
+    async updateProductByID(cid, pid, change) {
+        if (change === undefined || isNaN(parseInt(change))) 
+            throw new Error('La cantidad ingresada no es válida!');
+        
         await this.productDBManager.getProductByID(pid);  // Verifica si el producto existe
-    
+        
         const cart = await cartsModel.findOne({ _id: cid });
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
-    
-        const productIndex = cart.products.findIndex(item => item.productId.toString() === pid);  // Cambiar 'product' a 'productId'
-        if (productIndex === -1) throw new Error(`El producto ${pid} no existe en el carrito ${cid}!`);
-    
-        // Actualizar la cantidad
-        cart.products[productIndex].quantity = parseInt(quantity);
-    
+        
+        const productIndex = cart.products.findIndex(item => item.productId.toString() === pid);
+        if (productIndex === -1) 
+            throw new Error(`El producto ${pid} no existe en el carrito ${cid}!`);
+        
+        // Sumar o restar la cantidad, asegurándonos de que no sea menor que 1 (o 0)
+        const nuevaCantidad = cart.products[productIndex].quantity + parseInt(change);
+        if(nuevaCantidad < 1) {
+        
+            cart.products[productIndex].quantity = 1;
+        } else {
+            cart.products[productIndex].quantity = nuevaCantidad;
+        }
+        
         // Guardar el carrito actualizado
         await cartsModel.updateOne({ _id: cid }, { products: cart.products });
-    
+        
         // Retornar el carrito con los productos actualizados
         return await this.getProductsFromCartByID(cid);
     }
+    
 
     async deleteAllProducts(cid) {
         await cartsModel.updateOne({ _id: cid }, { products: [] });

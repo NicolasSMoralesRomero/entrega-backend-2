@@ -15,12 +15,10 @@
             <div class="d-flex justify-content-between">
                 <span>{{this.title}} - Cantidad: {{this.quantity}}</span>
                 <div>
-                    <button onclick="updateQuantity('{{this.productId._id}}', 1)"
-                        class="btn btn-success btn-sm">+</button>
-                    <button onclick="updateQuantity('{{this.productId._id}}', -1)"
-                        class="btn btn-warning btn-sm">-</button>
-                    <button onclick="removeFromCart('{{this.productId._id}}')"
-                        class="btn btn-danger btn-sm">Eliminar</button>
+                    <button onclick="updateQuantity('{{this.productId}}', 1)" class="btn btn-success btn-sm">+</button>
+                    <button onclick="updateQuantity('{{this.productId}}', -1)" class="btn btn-warning btn-sm">-</button>
+                    <button onclick="removeFromCart('{{this.productId}}')" class="btn btn-danger btn-sm">Eliminar</button>
+
                 </div>
             </div>
         </div>
@@ -36,57 +34,57 @@
         <a href="/api/products" class="btn btn-primary w-100">Volver a la tienda</a>
     </div>
 
-<script>
-    const cid = '{{cid}}';  // Se inyecta el ID del carrito
-    
-    function updateQuantity(productId, change) {
-        fetch(`/api/carts/${cid}/product/${productId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ quantity: change })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert('Cantidad actualizada');
-                location.reload();
-            } else {
-                alert('Error al actualizar la cantidad');
-            }
-        });
-    }
+    <script>
+        const cid = '{{cid}}';  // Se inyecta el ID del carrito
 
-    function removeFromCart(productId) {
-        fetch(`/api/carts/${cid}/product/${productId}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert('Producto eliminado');
-                location.reload();
-            } else {
-                alert('Error al eliminar el producto');
-            }
-        });
-    }
+        function updateQuantity(productId, change) {
+            fetch(`/api/carts/${cid}/product/${productId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity: change })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Cantidad actualizada');
+                        location.reload();
+                    } else {
+                        alert('Error al actualizar la cantidad');
+                    }
+                });
+        }
 
-    function clearCart() {
-        fetch(`/api/carts/${cid}/products`, {
-            method: 'DELETE'
-        })
-        .then(response => {
-            if (response.ok) {
-                alert('Carrito vacío');
-                location.reload();
-            } else {
-                alert('Error al vaciar el carrito');
-            }
-        });
-    }
-</script>
+        function removeFromCart(productId) {
+            fetch(`/api/carts/${cid}/product/${productId}`, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Producto eliminado');
+                        location.reload();
+                    } else {
+                        alert('Error al eliminar el producto');
+                    }
+                });
+        }
+
+        function clearCart() {
+            fetch(`/api/carts/${cid}/products`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Carrito vacío');
+                        location.reload();
+                    } else {
+                        alert('Error al vaciar el carrito');
+                    }
+                });
+        }
+    </script>
 </body>
 
 </html>
