@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 import MongoStore from "connect-mongo";
 import passport from 'passport';
 
+import { CONFIG } from './config/config.js';
+
 import productRouter from './routes/productRouter.js';
 import cartRouter from './routes/cartRouter.js';
 import viewsRouter from './routes/viewsRouter.js';
@@ -16,11 +18,10 @@ import { sessionRoutes } from './routes/sessionRouter.js';
 import { initializePassport } from './config/passport.config.js';
 
 const app = express();
-const MONGO_URL = 'mongodb+srv://nicomorales:C0hsHN0Of0oXC5aq@cluster0.rqnge.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
 // Mongoose
 mongoose
-  .connect(MONGO_URL)
+  .connect(CONFIG.MONGO.URL)
   .then(() => console.log("Conectado a la Base de datos"))
   .catch((err) => console.error(err));
 
@@ -37,11 +38,11 @@ app.use(express.static('public'));
 app.use(cookieParser());
 app.use(
   session({
-    secret: "s3cr3t",
+    secret: CONFIG.MONGO.SECRET,
     saveUninitialized: false,
     resave: false,
     store: MongoStore.create({
-      mongoUrl: MONGO_URL,
+      mongoUrl: CONFIG.MONGO.URL,
       ttl: 6000,
     }),
   })
@@ -58,9 +59,8 @@ app.use('/api/carts', cartRouter);
 app.use('/', viewsRouter);
 app.use('/api/sessions', sessionRoutes);
 
-const PORT = 8080;
-const httpServer = app.listen(PORT, () => {
-    console.log(`Start server in PORT ${PORT}`);
+const httpServer = app.listen(CONFIG.PORT, () => {
+    console.log(`Start server in PORT ${CONFIG.PORT}`);
 });
 
 const io = new Server(httpServer);

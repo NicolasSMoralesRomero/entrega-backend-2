@@ -5,13 +5,9 @@ import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 import { userModel } from "../dao/models/userModel.js";
 import { comparePassword, hashPassword } from "../utils/hash.js";
 
+import { CONFIG } from "./config.js";
 
-import { createToken, SECRET } from "../utils/jwtUtil.js";
-
-
-//Pasar a archivo .env despues de pre entrega
-const GITHUB_CLIENT_ID = "Iv23liAYgopAjBa1s2CQ";
-const GITHUB_CLIENT_SECRET = "758026f7f257963232bd64b0e85b7b04abb2d0bc";
+import { createToken } from "../utils/jwtUtil.js";
 
 const LocalStrategy = local.Strategy;
 
@@ -96,7 +92,7 @@ export function initializePassport() {
     "jwt",
     new JWTStrategy(
       {
-        secretOrKey: SECRET,
+        secretOrKey: CONFIG.JWT_SECRET,
         jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
       },
       async (payload, done) => {
@@ -118,9 +114,9 @@ export function initializePassport() {
     "github",
     new GithubStrategy(
       {
-        clientID: GITHUB_CLIENT_ID,
-        clientSecret: GITHUB_CLIENT_SECRET,
-        callbackURL: "http://localhost:8080/api/sessions/github-callback",
+        clientID: CONFIG.GITHUB.CLIENT_ID,
+        clientSecret: CONFIG.GITHUB.CLIENT_SECRET,
+        callbackURL: CONFIG.GITHUB.CALLBACK_URL,
         scope: ["user:email"],
       },
       async (accessToken, refreshToken, profile, done) => {
