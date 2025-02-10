@@ -39,7 +39,7 @@ router.get('/:cid', async (req, res) => {
         res.render('cart', {
             cart: cartProducts,
             total: total,
-            cid: cid  // <-- Agregado aquí
+            cid: cid
         });
 
     } catch (err) {
