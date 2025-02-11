@@ -31,7 +31,7 @@ router.get('/:cid', async (req, res) => {
         }));
 
         const total = cartProducts.reduce((acc, item) => acc + item.price * item.quantity, 0);
-        res.render('cart', { cart: cartProducts, total: total, cid: req.params.cid });
+        res.render('cart', { cart: cartProducts, total: total, cid: req.params.cid,  isSession: req.session.user ? true : false, });
     } catch (err) {
         res.status(400).json({ status: 'error', message: err.message });
     }

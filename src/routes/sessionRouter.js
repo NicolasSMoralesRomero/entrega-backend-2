@@ -135,5 +135,5 @@ sessionRoutes.get("/login", (req, res) => {
       return res.redirect("/api/sessions/login");
     }
   
-    res.render("profile", { title: "Profile", user: req.session.user });
+    res.render("profile", { title: "Profile", user: req.session.user, isSession });
   });

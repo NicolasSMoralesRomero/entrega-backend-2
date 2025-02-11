@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
             prevLink: result.products.prevLink,
             nextLink: result.products.nextLink,
             limit: parseInt(limit),
-            user: req.user || null, // Pasar usuario autenticado
+            isSession: req.session.user ? true : false, // Pasar usuario autenticado
             isAdmin: req.user && req.user.role === 'admin' // Pasar variable para Handlebars
         });
         
@@ -41,11 +41,10 @@ router.get('/:pid', async (req, res) => {
             return res.status(404).send('Producto no encontrado');
         }
 
-        console.log("Producto encontrado:", product); // 👈 Verifica que el producto se obtiene bien
-        
         res.render('productDetail', { 
             title: product.title, 
-            product 
+            product,
+            isSession: req.session.user ? true : false, // Verifica si hay sesión activa
         });
 
     } catch (err) {
