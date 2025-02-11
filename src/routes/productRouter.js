@@ -5,30 +5,42 @@ import { authorizeRole } from '../middlewares/authMiddleware.js';
 const router = Router();
 const productDB = new productDBManager();
 
-// Obtener todos los productos
+// Obtener todos los productos con paginación, filtros y ordenamiento
 router.get('/', async (req, res) => {
     try {
-        const { limit = 10, page = 1, category = '', sort = '' } = req.params;
-        const params = { limit: parseInt(limit), page: parseInt(page), category, sort };
+        let { limit = 10, page = 1, category = '', sort = 'title', sortOrder = 'asc' } = req.query;
+
+        limit = parseInt(limit);
+        page = parseInt(page);
+
+        // Construir parámetros de consulta alineados con WebSockets
+        const params = {
+            limit,
+            page,
+            category: category || null,
+            sort: { [sort]: sortOrder === 'asc' ? 1 : -1 }
+        };
 
         const result = await productDB.getAllProducts(params);
-        
+
         res.render('products', {
-            title: 'productos',
-            products: result.title,
+            title: 'Productos',
+            products: result.products,
             hasPrevPage: result.hasPrevPage,
             hasNextPage: result.hasNextPage,
             total: result.total,
-            prevLink: result.products.prevLink,
-            nextLink: result.products.nextLink,
-            limit: parseInt(limit),
-            isSession: req.session.user ? true : false, // Pasar usuario autenticado
-            isAdmin: req.user && req.user.role === 'admin' // Pasar variable para Handlebars
+            prevLink: result.prevLink,
+            nextLink: result.nextLink,
+            limit,
+            isSession: !!req.session.user,
+            isAdmin: req.user && req.user.role === 'admin',
+            sortBy: sort,   // Pasar ordenamiento a Handlebars
+            sortOrder       // Pasar dirección de ordenamiento a Handlebars
         });
-        
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

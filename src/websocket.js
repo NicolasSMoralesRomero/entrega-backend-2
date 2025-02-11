@@ -6,16 +6,31 @@ export default (io) => {
     io.on('connection', (socket) => {
         console.log('Nuevo cliente conectado');
 
-        // Obtener productos con paginación, filtros y orden
-        socket.on('getProducts', async ({ page = 1, limit = 10, category, sortBy = 'title', sortOrder = 'asc' }) => {
+        async function refreshProducts(socket) {
             try {
                 const { products, hasPrevPage, hasNextPage } = await productService.getAllProducts({
-                    page,
-                    limit,
-                    category,
-                    sortBy,
-                    sortOrder
+                    page: 1,
+                    limit: 10,
+                    category: '',
+                    sortBy: 'title',
+                    sortOrder: 'asc'
                 });
+                io.emit('updateProducts', { products, hasPrevPage, hasNextPage });
+            } catch (error) {
+                socket.emit('statusError', error.message);
+            }
+        }
+
+        // Obtener productos con paginación, filtros y orden
+        socket.on('getProducts', async ({ page, limit, category, sortBy, sortOrder }) => {
+            try {
+                const { products, hasPrevPage, hasNextPage } = await productService.getAllProducts({
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    category,
+                    sort: sortOrder
+                });
+        
                 socket.emit('updateProducts', { products, hasPrevPage, hasNextPage });
             } catch (error) {
                 socket.emit('statusError', error.message);
@@ -23,12 +38,14 @@ export default (io) => {
         });
 
         // Filtrar productos por categoría
-        socket.on('filterProducts', async ({ category, page = 1, limit = 10 }) => {
+        socket.on('filterProducts', async ({ category = '', page = 1, limit = 10, sortBy = 'title', sortOrder = 'asc' }) => {
             try {
                 const { products, hasPrevPage, hasNextPage } = await productService.getAllProducts({
-                    page,
-                    limit,
-                    category
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    category,
+                    sortBy,
+                    sortOrder
                 });
                 socket.emit('updateProducts', { products, hasPrevPage, hasNextPage });
             } catch (error) {
@@ -40,10 +57,7 @@ export default (io) => {
         socket.on('createProduct', async (data) => {
             try {
                 await productService.createProduct(data);
-                const { products } = await productService.getAllProducts({});  // Obtener productos después de crear uno nuevo
-                io.emit('updateProducts', { products });
-
-                // Emitir un evento de éxito al cliente que ha creado el producto
+                await refreshProducts(socket);
                 socket.emit('productCreated', { success: true, message: 'Producto creado exitosamente.' });
             } catch (error) {
                 socket.emit('statusError', error.message);
@@ -53,21 +67,19 @@ export default (io) => {
         // Eliminar un producto por ID
         socket.on('deleteProduct', async (data) => {
             try {
-                await productService.deleteProduct(data.pid);  // Eliminar el producto por su ID
-                const { products } = await productService.getAllProducts({});  // Obtener productos después de la eliminación
-                io.emit('updateProducts', { products });
+                await productService.deleteProduct(data.pid);
+                await refreshProducts(socket);
             } catch (error) {
                 socket.emit('statusError', error.message);
             }
         });
 
-        // Actualizar un producto existente (se puede agregar si se necesita)
+        // Actualizar un producto existente
         socket.on('updateProduct', async (data) => {
             try {
                 const { pid, updatedData } = data;
-                await productService.updateProduct(pid, updatedData);  // Llamada al método de actualización del producto
-                const { products } = await productService.getAllProducts({});  // Obtener productos después de actualizar uno
-                io.emit('updateProducts', { products });
+                await productService.updateProduct(pid, updatedData);
+                await refreshProducts(socket);
             } catch (error) {
                 socket.emit('statusError', error.message);
             }

@@ -53,8 +53,6 @@ router.put('/:cid/product/:pid', authorizeRole('user'), async (req, res) => {
         const { cid, pid } = req.params;
         const { quantity } = req.body;
 
-        console.log(`🔹 Recibido: carrito ${cid}, producto ${pid}, cambio ${quantity}`);
-
         if (!quantity || isNaN(quantity)) {
             console.log("❌ Cantidad inválida");
             return res.status(400).json({ error: 'Cantidad inválida' });
