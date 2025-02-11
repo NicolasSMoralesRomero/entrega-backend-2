@@ -24,22 +24,29 @@ class cartDBManager {
     }
 
     async addProductByID(cid, pid) {
+        // Verificar que el producto existe antes de agregarlo al carrito
         await this.productDBManager.getProductByID(pid);
-
-        const cart = await cartsModel.findOne({ _id: cid });
+    
+        const cart = await cartsModel.findById(cid);
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
-
-        let productIndex = cart.products.findIndex(item => item.productId === pid);
-
-        if (productIndex >= 0) {
+    
+        // Buscar si el producto ya está en el carrito
+        let productIndex = cart.products.findIndex(item => item.productId.toString() === pid);
+    
+        if (productIndex !== -1) {
+            // Si ya existe, aumentar la cantidad
             cart.products[productIndex].quantity += 1;
         } else {
+            // Si no existe, agregarlo con cantidad 1
             cart.products.push({ productId: pid, quantity: 1 });
         }
-
-        await cartsModel.updateOne({ _id: cid }, { products: cart.products });
+    
+        // Guardar el carrito actualizado
+        await cart.save();
+        
         return await this.getProductsFromCartByID(cid);
     }
+    
 
     async deleteProductByID(cid, pid) {
         await this.productDBManager.getProductByID(pid);  // Verifica si el producto existe

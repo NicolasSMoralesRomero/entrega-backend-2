@@ -59,8 +59,6 @@ router.put('/:cid/product/:pid', authorizeRole('user'), async (req, res) => {
         }
 
         const updatedCart = await CartService.updateProductByID(cid, pid, quantity);
-        
-        console.log("✅ Carrito actualizado:", updatedCart);
 
         res.json({ status: 'success', cart: updatedCart });
 
