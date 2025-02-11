@@ -7,14 +7,11 @@ import cookieParser from "cookie-parser";
 import MongoStore from "connect-mongo";
 import passport from 'passport';
 
+import { router } from "./routes/indexRouter.js";
 import { CONFIG } from './config/config.js';
 
-import productRouter from './routes/productRouter.js';
-import cartRouter from './routes/cartRouter.js';
-import viewsRouter from './routes/viewsRouter.js';
 import __dirname from './utils/constantsUtil.js';
 import websocket from './websocket.js';
-import { sessionRoutes } from './routes/sessionRouter.js';
 import { initializePassport } from './config/passport.config.js';
 
 const app = express();
@@ -53,11 +50,8 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
-//Routers
-app.use('/api/products', productRouter);
-app.use('/api/carts', cartRouter);
-app.use('/', viewsRouter);
-app.use('/api/sessions', sessionRoutes);
+//Router
+app.use('/', router);
 
 const httpServer = app.listen(CONFIG.PORT, () => {
     console.log(`Start server in PORT ${CONFIG.PORT}`);
