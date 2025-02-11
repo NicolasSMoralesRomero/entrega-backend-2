@@ -18,7 +18,6 @@
                     <button onclick="updateQuantity('{{this.productId}}', 1)" class="btn btn-success btn-sm">+</button>
                     <button onclick="updateQuantity('{{this.productId}}', -1)" class="btn btn-warning btn-sm">-</button>
                     <button onclick="removeFromCart('{{this.productId}}')" class="btn btn-danger btn-sm">Eliminar</button>
-
                 </div>
             </div>
         </div>
@@ -31,11 +30,12 @@
 
     <div class="mt-4">
         <button onclick="clearCart()" class="btn btn-danger w-100 mb-3">Vaciar Carrito</button>
+        <button onclick="purchaseCart()" class="btn btn-success w-100 mb-3">Finalizar Compra</button>
         <a href="/api/products" class="btn btn-primary w-100">Volver a la tienda</a>
     </div>
 
     <script>
-        const cid = '{{cid}}';  // Se inyecta el ID del carrito
+        const cid = '{{cid}}';  // ID del carrito
 
         function updateQuantity(productId, change) {
             fetch(`/api/carts/${cid}/product/${productId}`, {
@@ -83,6 +83,31 @@
                         alert('Error al vaciar el carrito');
                     }
                 });
+        }
+
+        function purchaseCart() {
+            fetch(`/api/carts/${cid}/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ticket) {
+                    alert(`Compra realizada con éxito. Código del ticket: ${data.ticket.code}`);
+                    if (data.unprocessedProducts.length > 0) {
+                        alert(`Algunos productos no tenían stock suficiente y no fueron comprados.`);
+                    }
+                    location.reload();
+                } else {
+                    alert('Error al procesar la compra.');
+                }
+            })
+            .catch(error => {
+                console.error('Error en la compra:', error);
+                alert('Hubo un error al procesar la compra.');
+            });
         }
     </script>
 </body>

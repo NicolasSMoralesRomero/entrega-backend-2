@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import productDBManager from '../dao/productDBManager.js';
+import { authorizeRole } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 const productDB = new productDBManager();
 
-// Endpoint para obtener todos los productos con paginación y filtro por categoría
+// Obtener todos los productos
 router.get('/', async (req, res) => {
     try {
         const { limit = 10, page = 1, category = '', sort = '' } = req.params;
@@ -20,7 +21,9 @@ router.get('/', async (req, res) => {
             total: result.total,
             prevLink: result.products.prevLink,
             nextLink: result.products.nextLink,
-            limit: parseInt(limit)
+            limit: parseInt(limit),
+            user: req.user || null, // Pasar usuario autenticado
+            isAdmin: req.user && req.user.role === 'admin' // Pasar variable para Handlebars
         });
         
     } catch (err) {
@@ -29,70 +32,54 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Endpoint para obtener un producto por ID
+// Obtener un producto por ID
 router.get('/:pid', async (req, res) => {
     try {
-        const product = await productDB.getProductByID(req.params.pid)
+        const product = await productDB.getProductByID(req.params.pid);
         
-        if (product) {
-            const productData = {
-                _id: product._id,
-                title: product.title,
-                description: product.description,
-                price: product.price,
-                stock: product.stock,
-                category: product.category
-            };
-            res.render('productDetail', {
-                title: product.title,
-                product: productData
-            });
-        } else {
-            res.status(404).send('Producto no encontrado');
+        if (!product) {
+            return res.status(404).send('Producto no encontrado');
         }
+
+        console.log("Producto encontrado:", product); // 👈 Verifica que el producto se obtiene bien
+        
+        res.render('productDetail', { 
+            title: product.title, 
+            product 
+        });
+
     } catch (err) {
-        console.error(err);
+        console.error("Error al obtener producto:", err);
         res.status(500).send('Internal Server Error');
     }
 });
 
-// Endpoint para crear un nuevo producto
-router.post('/', async (req, res) => {
-    const { title, description, price, stock, category } = req.body;
-
-    if (!title || !description || !price || !category) {
-        return res.status(400).json({ error: 'Faltan parámetros requeridos' });
-    }
-
+// Crear un producto (SOLO ADMINISTRADOR)
+router.post('/', authorizeRole('admin'), async (req, res) => {
     try {
         const newProduct = await productDB.createProduct(req.body);
-        console.log(newProduct);
-        
         res.status(201).json(newProduct);
     } catch (err) {
-        console.error(err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-// Endpoint para actualizar un producto
-router.put('/:pid', async (req, res) => {
+// Actualizar un producto (SOLO ADMINISTRADOR)
+router.put('/:pid', authorizeRole('admin'), async (req, res) => {
     try {
         const updatedProduct = await productDB.updateProduct(req.params.pid, req.body);
         res.json(updatedProduct);
     } catch (err) {
-        console.error(err);
         res.status(404).json({ error: err.message });
     }
 });
 
-// Endpoint para eliminar un producto
-router.delete('/:pid', async (req, res) => {
+// Eliminar un producto (SOLO ADMINISTRADOR)
+router.delete('/:pid', authorizeRole('admin'), async (req, res) => {
     try {
         await productDB.deleteProduct(req.params.pid);
         res.status(204).end();
     } catch (err) {
-        console.error(err);
         res.status(404).json({ error: err.message });
     }
 });

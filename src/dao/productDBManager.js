@@ -39,7 +39,7 @@ class productDBManager {
     }
 
     async getProductByID(pid) {
-        const product = await productModel.findById(pid);
+        const product = await productModel.findById(pid).lean();
         if (!product) throw new Error(`El producto ${pid} no existe!`);
         return product;
     }

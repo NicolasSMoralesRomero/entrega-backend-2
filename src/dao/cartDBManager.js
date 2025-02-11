@@ -68,8 +68,9 @@ class cartDBManager {
     }
 
     async updateProductByID(cid, pid, change) {
-        if (change === undefined || isNaN(parseInt(change))) 
+        if (change === undefined || isNaN(parseInt(change))) {
             throw new Error('La cantidad ingresada no es válida!');
+        }
         
         await this.productDBManager.getProductByID(pid);  // Verifica si el producto existe
         
@@ -77,24 +78,27 @@ class cartDBManager {
         if (!cart) throw new Error(`El carrito ${cid} no existe!`);
         
         const productIndex = cart.products.findIndex(item => item.productId.toString() === pid);
-        if (productIndex === -1) 
+        
+        if (productIndex === -1) {
             throw new Error(`El producto ${pid} no existe en el carrito ${cid}!`);
-        
-        // Sumar o restar la cantidad, asegurándonos de que no sea menor que 1 (o 0)
+        }
+    
+        // Sumar/restar cantidad
         const nuevaCantidad = cart.products[productIndex].quantity + parseInt(change);
-        if(nuevaCantidad < 1) {
-        
-            cart.products[productIndex].quantity = 1;
+    
+        if (nuevaCantidad <= 0) {
+            // Si la cantidad es 0 o menos, eliminamos el producto del carrito
+            cart.products.splice(productIndex, 1);
         } else {
             cart.products[productIndex].quantity = nuevaCantidad;
         }
+    
+        // Guardar cambios
+        await cart.save();
         
-        // Guardar el carrito actualizado
-        await cartsModel.updateOne({ _id: cid }, { products: cart.products });
-        
-        // Retornar el carrito con los productos actualizados
+        // Retornar el carrito actualizado
         return await this.getProductsFromCartByID(cid);
-    }
+    }    
     
 
     async deleteAllProducts(cid) {
