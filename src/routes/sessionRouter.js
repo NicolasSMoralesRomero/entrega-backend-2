@@ -30,6 +30,7 @@ sessionRoutes.post(
       last_name: req.user.last_name,
       email: req.user.email,
       age: req.user.age,
+      role: req.user.role
     };
 
     //res.status(200).json({ message: "User logged in", user: req.session.user });
@@ -51,6 +52,7 @@ sessionRoutes.get(
         last_name: req.user.last_name,
         email: req.user.email,
         age: req.user.age,
+        role: req.user.role
       },
     });
   }
@@ -134,6 +136,5 @@ sessionRoutes.get("/login", (req, res) => {
     if (!isSession) {
       return res.redirect("/api/sessions/login");
     }
-  
     res.render("profile", { title: "Profile", user: req.session.user, isSession });
   });

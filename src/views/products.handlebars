@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,109 +21,113 @@
             sortOrder = urlParams.get('sortOrder') || 'asc';
         }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const socket = io();
-    let currentPage = 1;
-    const limit = 10;
-    let selectedCategory = '';
-    let sortBy = 'title';
-    let sortOrder = 'asc';
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io();
 
-    const categorySelect = document.getElementById('categorySelect');
-    const prevButton = document.getElementById('prevButton');
-    const nextButton = document.getElementById('nextButton');
-    const sortSelect = document.getElementById('sortSelect');
-    const orderSelect = document.getElementById('orderSelect');
-    const productList = document.getElementById('productList');
+            // ✅ Obtención de elementos del DOM
+            const categorySelect = document.getElementById('categorySelect');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const sortSelect = document.getElementById('sortSelect');
+            const orderSelect = document.getElementById('orderSelect');
+            const productList = document.getElementById('productList');
+            const productForm = document.getElementById('productForm'); // ✅ Corrección
 
-    function getUrlParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-        currentPage = parseInt(urlParams.get('page')) || 1;
-        selectedCategory = urlParams.get('category') || '';
-        sortBy = urlParams.get('sortBy') || 'title';
-        sortOrder = urlParams.get('sortOrder') || 'asc';
-    }
+            function updateURL() {
+                const url = new URL(window.location);
+                url.searchParams.set('page', currentPage);
+                url.searchParams.set('category', selectedCategory);
+                url.searchParams.set('sortBy', sortBy);
+                url.searchParams.set('sortOrder', sortOrder);
+                window.history.pushState({}, '', url);
+            }
 
-    function updateURL() {
-        const url = new URL(window.location);
-        url.searchParams.set('page', currentPage);
-        url.searchParams.set('category', selectedCategory);
-        url.searchParams.set('sortBy', sortBy);
-        url.searchParams.set('sortOrder', sortOrder);
-        window.history.pushState({}, '', url);
-    }
+            function loadProducts() {
+                socket.emit('getProducts', { page: currentPage, limit, category: selectedCategory, sortBy, sortOrder });
+            }
 
-    function loadProducts() {
-        socket.emit('getProducts', { page: currentPage, limit, category: selectedCategory, sortBy, sortOrder });
-    }
+            socket.on('updateProducts', ({ products, hasPrevPage, hasNextPage }) => {
+                productList.innerHTML = products.map(product => `
+                    <li class="list-group-item">
+                        ${product.title || 'Sin nombre'} - ${product.price}
+                        <button onclick="addToCart('${product._id}')">Agregar al carrito</button>
+                        <button onclick="showDetails('${product._id}')">Mostrar más</button>
+                    </li>`).join('');
 
-    socket.on('updateProducts', ({ products, hasPrevPage, hasNextPage }) => {
-        productList.innerHTML = products.map(product => `
-            <li class="list-group-item">
-                ${product.title || 'Sin nombre'} - ${product.price}
-                <button onclick="addToCart('${product._id}')">Agregar al carrito</button>
-                <button onclick="showDetails('${product._id}')">Mostrar más</button>
-            </li>`
-        ).join('');
+                prevButton.disabled = !hasPrevPage;
+                nextButton.disabled = !hasNextPage;
+                updateURL();
+            });
 
-        prevButton.disabled = !hasPrevPage;
-        nextButton.disabled = !hasNextPage;
-        updateURL();
-    });
+            // ✅ Eventos para filtros y paginación
+            categorySelect.addEventListener('change', () => {
+                selectedCategory = categorySelect.value;
+                currentPage = 1;
+                loadProducts();
+            });
 
-    categorySelect.addEventListener('change', () => {
-        selectedCategory = categorySelect.value;
-        currentPage = 1;
-        loadProducts();
-    });
+            sortSelect.addEventListener('change', () => {
+                sortBy = sortSelect.value;
+                currentPage = 1;
+                loadProducts();
+            });
 
-    sortSelect.addEventListener('change', () => {
-        sortBy = sortSelect.value;
-        currentPage = 1;
-        loadProducts();
-    });
+            orderSelect.addEventListener('change', () => {
+                sortOrder = orderSelect.value;
+                currentPage = 1;
+                loadProducts();
+            });
 
-    orderSelect.addEventListener('change', () => {
-        sortOrder = orderSelect.value;
-        currentPage = 1;
-        loadProducts();
-    });
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadProducts();
+                }
+            });
 
-    prevButton.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
+            nextButton.addEventListener('click', () => {
+                currentPage++;
+                loadProducts();
+            });
+
+            // ✅ Crear producto (solo admins)
+            if (productForm) {
+                productForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+
+                    const title = event.target.title.value;
+                    const description = event.target.description.value;
+                    const price = event.target.price.value;
+                    const stock = event.target.stock.value;
+                    const category = event.target.category.value;
+
+                    socket.emit('createProduct', { title, description, price, stock, category });
+                    event.target.reset();
+                });
+            }
+
+            getUrlParams();
             loadProducts();
+        });
+
+        function addToCart(productId) {
+            fetch(`/api/carts/670457eadbee7b2e09aacd6f/product/${productId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity: 1 })
+            })
+            .then(response => response.ok ? response.json() : Promise.reject('Error al agregar el producto al carrito'))
+            .then(data => {
+                alert('Producto agregado al carrito');
+            })
+            .catch(error => alert(error));
         }
-    });
 
-    nextButton.addEventListener('click', () => {
-        currentPage++;
-        loadProducts();
-    });
-
-    getUrlParams();
-    loadProducts();
-});
-
-function addToCart(productId) {
-    fetch(`/api/carts/670457eadbee7b2e09aacd6f/product/${productId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: 1 })
-    })
-    .then(response => response.ok ? response.json() : Promise.reject('Error al agregar el producto al carrito'))
-    .then(data => {
-        alert('Producto agregado al carrito');
-    })
-    .catch(error => alert(error));
-}
-
-function showDetails(productId) {
-    window.location.href = `/api/products/${productId}`;
-}
+        function showDetails(productId) {
+            window.location.href = `/api/products/${productId}`;
+        }
     </script>
 </head>
-
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Productos</h1>
