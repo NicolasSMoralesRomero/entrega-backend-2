@@ -2,6 +2,7 @@ import { userModel } from "../dao/models/userModel.js";
 import { Router } from "express";
 import { comparePassword, hashPassword } from "../utils/hash.js";
 import passport from "passport";
+import UserDTO from "../dto/userDTO.js";
 
 export const sessionRoutes = Router();
 
@@ -45,15 +46,10 @@ sessionRoutes.get(
   "/current",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
+    const userDTO = new UserDTO(req.user);
     res.json({
       message: "Current user",
-      token: {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        email: req.user.email,
-        age: req.user.age,
-        role: req.user.role
-      },
+      user: userDTO,
     });
   }
 );
