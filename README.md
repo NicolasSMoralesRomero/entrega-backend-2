@@ -5,7 +5,6 @@ El repositorio del proyecto original es:
 [https://github.com/NicolasSMoralesRomero/entrega-backend](https://github.com/NicolasSMoralesRomero/entrega-backend)
 
 En este proyecto se refactoriza el código del proyecto original, tomando como base el código de muestra ofrecido por CoderHouse.  
-El apartado de **Productos** y **Carrito** sigue en construcción.
 
 ## Pasos para clonar y testear el código
 
@@ -20,9 +19,7 @@ El apartado de **Productos** y **Carrito** sigue en construcción.
 npm install
 ```
 
-3. Configurar las credenciales de GitHub en el archivo passport.config.js.
-
-Estas credenciales (GITHUB_CLIENT_ID y GITHUB_CLIENT_SECRET) deben ser definidas en dicho archivo, ubicado en la carpeta config.
+3. Configurar las credenciales en el archivo .env, utilizando los datos proporcionados en la entrega.
 
 4. Para levantar el servidor, ejecuta el siguiente comando:
 
@@ -40,9 +37,23 @@ Usuarios disponibles:
 #
 Email: nico@gmail.com
 Contraseña: 12345
+Rol: Admin
 #
-Email: cindy@gmail.com
+Email: tomi@gmail.com
 Contraseña: 12345
+Rol: User
 
 ⚠️ **Advertencia:**  
 A veces cuando recién se inició el servidor y se intenta iniciar sesión, la página no carga. Ingresar nuevamente a http://localhost:8080/ y volver a hacer el login. 
+
+## Agregado para entrega final.
+- Se optimizaron los endpoints de carrito y productos para corregir errores y mejorar su estabilidad.
+- El botón "Agregar al carrito" desaparece en los productos cuando el usuario tiene rol "Admin".
+- La opción "Carrito" se oculta en la barra de navegación si el usuario tiene rol "Admin".
+- Si el carrito está vacío ($0), los botones "Finalizar compra" y "Vaciar carrito" se desactivan.
+- Se mejoró la lógica de filtrado, eliminando opciones hardcodeadas y obteniendo dinámicamente las categorías desde la base de datos.
+- En la vista productDetail.handlebars:
+- Se agregó un formulario para actualizar los datos del producto.
+-Se añadió un botón para eliminar el producto.
+Ambas opciones solo están disponibles para usuarios con rol "Admin".
+-Se realizaron ajustes responsivos en las plantillas Handlebars para mejorar la experiencia en dispositivos móviles.
