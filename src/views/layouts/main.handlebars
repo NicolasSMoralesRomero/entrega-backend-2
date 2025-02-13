@@ -26,9 +26,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/api/products">Productos</a>
                         </li>
+                        {{#unless isAdmin}}
                         <li class="nav-item">
                             <a class="nav-link" href="/api/carts/670457eadbee7b2e09aacd6f">Carrito</a>
                         </li>
+                        {{/unless}}
                         <li class="nav-item">
                             <a class="nav-link" href="/api/sessions/profile">Perfil</a>
                         </li>

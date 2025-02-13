@@ -132,9 +132,16 @@ sessionRoutes.get("/login", (req, res) => {
   
   sessionRoutes.get("/profile", (req, res) => {
     const isSession = req.session.user ? true : false;
-  
+    const isAdmin = req.session.user && req.session.user.role === "admin"; // Verifica si es admin
+
     if (!isSession) {
-      return res.redirect("/api/sessions/login");
+        return res.redirect("/api/sessions/login");
     }
-    res.render("profile", { title: "Profile", user: req.session.user, isSession });
-  });
+
+    res.render("profile", { 
+        title: "Profile", 
+        user: req.session.user, 
+        isSession, 
+        isAdmin // Pasa el valor a Handlebars
+    });
+});

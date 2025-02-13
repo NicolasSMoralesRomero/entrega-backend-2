@@ -16,6 +16,7 @@ router.get('/', async (req, res) => {
 
         //sessions
         const isSession = req.session.user ? true : false;
+        const isAdmin = req.session.user && req.session.user.role === "admin";
 
         if (!cart) {
             cart = new createCart();
@@ -27,6 +28,7 @@ router.get('/', async (req, res) => {
             products,
             cartProducts: cart.products,
             isSession,
+            isAdmin
         });
     } catch (err) {
         console.error(err);

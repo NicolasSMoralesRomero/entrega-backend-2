@@ -1,6 +1,5 @@
 export function authorizeRole(requiredRole) {
     return (req, res, next) => {
-        console.log(`Usuario autenticado: ${req.user?.email}, Rol: ${req.user?.role}`);
 
         if (!req.user) {
             console.log("Acceso denegado: usuario no autenticado");

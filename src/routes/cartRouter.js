@@ -91,18 +91,32 @@ router.delete('/:cid/products', async (req, res) => {
 // Finalizar compra del carrito
 router.post('/:cid/purchase', async (req, res) => {
     try {
+        console.log(`Iniciando compra del carrito ${req.params.cid}`);
         const cart = await CartService.getProductsFromCartByID(req.params.cid);
-        if (!cart) return res.status(404).json({ message: 'Carrito no encontrado' });
+
+        if (!cart) {
+            console.log('Carrito no encontrado');
+            return res.status(404).json({ message: 'Carrito no encontrado' });
+        }
 
         let totalAmount = 0, unprocessedProducts = [];
         for (const item of cart.products) {
+            console.log(`Verificando stock para producto: ${item.productId.title}`);
+            console.log(`Stock actual: ${item.productId.stock}, cantidad en carrito: ${item.quantity}`);
+
             if (item.productId.stock >= item.quantity) {
                 item.productId.stock -= item.quantity;
                 await item.productId.save();
                 totalAmount += item.productId.price * item.quantity;
             } else {
+                console.log(`Stock insuficiente para ${item.productId.title}`);
                 unprocessedProducts.push(item.productId._id);
             }
+        }
+
+        if (totalAmount === 0) {
+            console.log('Ningún producto pudo ser comprado.');
+            return res.json({ message: 'No se pudo procesar la compra', unprocessedProducts });
         }
 
         const ticket = await ticketModel.create({
@@ -114,8 +128,11 @@ router.post('/:cid/purchase', async (req, res) => {
         cart.products = cart.products.filter(item => unprocessedProducts.includes(item.productId._id));
         await cart.save();
 
+        console.log(`Compra finalizada con éxito. Ticket: ${ticket.code}`);
         res.json({ ticket, unprocessedProducts });
+
     } catch (error) {
+        console.error('Error en la compra:', error);
         res.status(500).json({ message: 'Error procesando la compra', error });
     }
 });
