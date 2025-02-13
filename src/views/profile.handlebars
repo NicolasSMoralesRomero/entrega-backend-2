@@ -6,18 +6,22 @@
     </script>
 </head>
 
-<div class="card text-bg-primary m-3">
-  <div class="card-header">
-    <h1> Perfil del usuario </h1>
-  </div>
-  <div class="card-body">
+<div class="container mt-5">
+    <div class="card text-bg-primary shadow-lg">
+        <div class="card-header text-center">
+            <h1 class="mb-0">Perfil del Usuario</h1>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Nombre:</strong> {{user.first_name}} {{user.last_name}}</li>
+                <li class="list-group-item"><strong>Edad:</strong> {{user.age}}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{user.email}}</li>
+                <li class="list-group-item"><strong>Rol:</strong> {{user.role}}</li>
+            </ul>
 
-    <ul>
-      <li>Nombre: {{user.first_name}} {{user.last_name}} </li>
-      <li>Edad: {{user.age}} </li>
-      <li>Mail: {{user.email}} </li>
-      <li>Rol: {{user.role}} </li>
-    </ul>
-
-    <button onclick="logOut()">Cerrar sesión</button>
-  </div>
+            <div class="d-flex justify-content-center mt-4">
+                <button class="btn btn-danger px-4" onclick="logOut()">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+</div>

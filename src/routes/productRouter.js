@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
             nextLink: result.nextLink,
             limit,
             isSession: !!req.session.user,
-            isAdmin: req.user && req.user.role === 'admin',
+            isAdmin: req.session.user && req.session.user.role === 'admin',
             sortBy: sort,   // Pasar ordenamiento a Handlebars
             sortOrder       // Pasar dirección de ordenamiento a Handlebars
         });
@@ -56,7 +56,8 @@ router.get('/:pid', async (req, res) => {
         res.render('productDetail', { 
             title: product.title, 
             product,
-            isSession: req.session.user ? true : false, // Verifica si hay sesión activa
+            isSession: req.session.user ? true : false,
+            isAdmin: req.session.user && req.session.user.role === 'admin'
         });
 
     } catch (err) {

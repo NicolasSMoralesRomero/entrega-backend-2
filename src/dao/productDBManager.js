@@ -21,8 +21,8 @@ class productDBManager {
             .sort(sort)
             .limit(limit)
             .skip(skip)
-            .lean(); // Usamos .lean() para mejorar el rendimiento en lectura
-    
+            .lean(); 
+            
         // Contar el total de productos
         const total = await productModel.countDocuments(query);
         const totalPages = Math.ceil(total / limit);

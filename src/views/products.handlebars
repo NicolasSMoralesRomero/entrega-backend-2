@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +32,7 @@
             const sortSelect = document.getElementById('sortSelect');
             const orderSelect = document.getElementById('orderSelect');
             const productList = document.getElementById('productList');
-            const productForm = document.getElementById('productForm'); // ✅ Corrección
+            const productForm = document.getElementById('productForm');
 
             function updateURL() {
                 const url = new URL(window.location);
@@ -48,11 +49,15 @@
 
             socket.on('updateProducts', ({ products, hasPrevPage, hasNextPage }) => {
                 productList.innerHTML = products.map(product => `
-                    <li class="list-group-item">
-                        ${product.title || 'Sin nombre'} - ${product.price}
-                        <button onclick="addToCart('${product._id}')">Agregar al carrito</button>
-                        <button onclick="showDetails('${product._id}')">Mostrar más</button>
-                    </li>`).join('');
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>${product.title || 'Sin nombre'} - $${product.price}</span>
+                    <div>
+                        <button class="btn btn-info btn-sm" onclick="showDetails('${product._id}')">Detalles</button>
+                        {{#unless isAdmin}}
+                            <button class="btn btn-success btn-sm" onclick="addToCart('${product._id}')">Agregar al carrito</button>
+                        {{/unless}}
+                    </div>
+                </li>`).join('');
 
                 prevButton.disabled = !hasPrevPage;
                 nextButton.disabled = !hasNextPage;
@@ -116,11 +121,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ quantity: 1 })
             })
-            .then(response => response.ok ? response.json() : Promise.reject('Error al agregar el producto al carrito'))
-            .then(data => {
-                alert('Producto agregado al carrito');
-            })
-            .catch(error => alert(error));
+                .then(response => response.ok ? response.json() : Promise.reject('Error al agregar el producto al carrito'))
+                .then(data => {
+                    alert('Producto agregado al carrito');
+                })
+                .catch(error => alert(error));
         }
 
         function showDetails(productId) {
@@ -128,6 +133,7 @@
         }
     </script>
 </head>
+
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Productos</h1>
@@ -135,11 +141,16 @@
         {{#if isAdmin}}
         <h2 class="mt-4">¡Crea tus productos!</h2>
         <form id="productForm" class="mb-4">
-            <div class="form-group"><input type="text" name="title" placeholder="Título" required class="form-control"></div>
-            <div class="form-group"><textarea name="description" placeholder="Descripción" required class="form-control"></textarea></div>
-            <div class="form-group"><input type="number" name="price" placeholder="Precio" required class="form-control"></div>
-            <div class="form-group"><input type="number" name="stock" placeholder="Stock" required min="0" class="form-control"></div>
-            <div class="form-group"><input type="text" name="category" placeholder="Categoría" required class="form-control"></div>
+            <div class="form-group"><input type="text" name="title" placeholder="Título" required class="form-control">
+            </div>
+            <div class="form-group"><textarea name="description" placeholder="Descripción" required
+                    class="form-control"></textarea></div>
+            <div class="form-group"><input type="number" name="price" placeholder="Precio" required
+                    class="form-control"></div>
+            <div class="form-group"><input type="number" name="stock" placeholder="Stock" required min="0"
+                    class="form-control"></div>
+            <div class="form-group"><input type="text" name="category" placeholder="Categoría" required
+                    class="form-control"></div>
             <button type="submit" class="btn btn-primary w-100">Agregar producto</button>
         </form>
         {{/if}}
@@ -170,4 +181,5 @@
         <button id="nextButton" class="btn btn-secondary" disabled>Página Siguiente</button>
     </div>
 </body>
+
 </html>
