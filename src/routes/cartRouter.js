@@ -100,32 +100,49 @@ router.post('/:cid/purchase', async (req, res) => {
         }
 
         let totalAmount = 0, unprocessedProducts = [];
+        const productsToUpdate = [];
+
         for (const item of cart.products) {
             console.log(`Verificando stock para producto: ${item.productId.title}`);
             console.log(`Stock actual: ${item.productId.stock}, cantidad en carrito: ${item.quantity}`);
 
             if (item.productId.stock >= item.quantity) {
                 item.productId.stock -= item.quantity;
-                await item.productId.save();
+                productsToUpdate.push(item.productId.save()); // Guardar actualización sin ejecutarla aún
                 totalAmount += item.productId.price * item.quantity;
             } else {
                 console.log(`Stock insuficiente para ${item.productId.title}`);
-                unprocessedProducts.push(item.productId._id);
+                unprocessedProducts.push({
+                    id: item.productId._id.toString(), // Guardamos solo el ID como string
+                    title: item.productId.title,
+                    stock: item.productId.stock
+                });
             }
         }
+
+        // Guardar todos los productos con stock actualizado en paralelo
+        await Promise.all(productsToUpdate);
 
         if (totalAmount === 0) {
             console.log('Ningún producto pudo ser comprado.');
             return res.json({ message: 'No se pudo procesar la compra', unprocessedProducts });
         }
 
+        // Crear ticket
         const ticket = await ticketModel.create({
             code: uuidv4(),
             amount: totalAmount,
             purchaser: req.user.email
         });
 
-        cart.products = cart.products.filter(item => unprocessedProducts.includes(item.productId._id));
+        // Obtener los IDs de los productos NO comprados
+        const unprocessedProductIds = unprocessedProducts.map(p => p.id);
+
+        // Filtrar el carrito y mantener solo los productos que NO se compraron
+        cart.products = cart.products.filter(item =>
+            unprocessedProductIds.includes(item.productId._id.toString())
+        );
+
         await cart.save();
 
         console.log(`Compra finalizada con éxito. Ticket: ${ticket.code}`);

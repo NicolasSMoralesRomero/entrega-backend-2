@@ -72,6 +72,11 @@ class productDBManager {
         if (!deletedProduct) throw new Error(`El producto ${pid} no existe!`);
         return deletedProduct;
     }
+
+    async getUniqueCategories() {
+        const categories = await productModel.distinct('category');
+        return categories;
+    }
 }
 
 export default productDBManager;

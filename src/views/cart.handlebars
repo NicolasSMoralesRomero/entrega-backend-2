@@ -10,16 +10,18 @@
 
 <body>
     <h1 class="text-center mt-5">Productos en el Carrito</h1>
-    
+
     <div id="cartItems" class="mt-4">
         {{#each cart}}
         <div class="cart-item mb-3 p-3 border rounded">
             <div class="d-flex justify-content-between align-items-center">
-                <span><strong>{{this.title}}</strong> - Cantidad: <span id="quantity-{{this.productId}}">{{this.quantity}}</span></span>
+                <span><strong>{{this.title}}</strong> - Cantidad: <span
+                        id="quantity-{{this.productId}}">{{this.quantity}}</span></span>
                 <div>
                     <button onclick="updateQuantity('{{this.productId}}', 1)" class="btn btn-success btn-sm">+</button>
                     <button onclick="updateQuantity('{{this.productId}}', -1)" class="btn btn-warning btn-sm">-</button>
-                    <button onclick="removeFromCart('{{this.productId}}')" class="btn btn-danger btn-sm">Eliminar</button>
+                    <button onclick="removeFromCart('{{this.productId}}')"
+                        class="btn btn-danger btn-sm">Eliminar</button>
                 </div>
             </div>
         </div>
@@ -39,6 +41,17 @@
     <script>
         const cid = '{{cid}}';  // ID del carrito
 
+        document.addEventListener("DOMContentLoaded", () => {
+            const totalAmount = parseFloat(document.getElementById("totalAmount").textContent);
+            const clearCartBtn = document.querySelector("button[onclick='clearCart()']");
+            const purchaseCartBtn = document.querySelector("button[onclick='purchaseCart()']");
+
+            if (totalAmount === 0) {
+                clearCartBtn.disabled = true;
+                purchaseCartBtn.disabled = true;
+            }
+        });
+
         function updateQuantity(productId, change) {
             fetch(`/api/carts/${cid}/product/${productId}`, {
                 method: 'PUT',
@@ -47,66 +60,66 @@
                 },
                 body: JSON.stringify({ quantity: change })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({
-                        title: 'Cantidad actualizada',
-                        icon: 'success',
-                        timer: 800,
-                        showConfirmButton: false
-                    }).then(() => location.reload());
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'No se pudo actualizar la cantidad',
-                        icon: 'error'
-                    });
-                }
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: 'Cantidad actualizada',
+                            icon: 'success',
+                            timer: 800,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo actualizar la cantidad',
+                            icon: 'error'
+                        });
+                    }
+                });
         }
 
         function removeFromCart(productId) {
             fetch(`/api/carts/${cid}/product/${productId}`, {
                 method: 'DELETE'
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({
-                        title: 'Producto eliminado',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => location.reload());
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'No se pudo eliminar el producto',
-                        icon: 'error'
-                    });
-                }
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: 'Producto eliminado',
+                            icon: 'success',
+                            timer: 800,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo eliminar el producto',
+                            icon: 'error'
+                        });
+                    }
+                });
         }
 
         function clearCart() {
             fetch(`/api/carts/${cid}/products`, { method: 'DELETE' })
-            .then(response => {
-                if (response.ok) {
-                    Swal.fire({
-                        title: 'Carrito vacío',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => location.reload());
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'No se pudo vaciar el carrito',
-                        icon: 'error'
-                    });
-                }
-            });
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Carrito vacío',
+                            icon: 'success',
+                            timer: 800,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo vaciar el carrito',
+                            icon: 'error'
+                        });
+                    }
+                });
         }
 
         function purchaseCart() {
@@ -114,42 +127,46 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.ticket) {
-                    Swal.fire({
-                        title: 'Compra realizada con éxito',
-                        text: `Código del ticket: ${data.ticket.code}`,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-
-                    if (data.unprocessedProducts.length > 0) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ticket) {
                         Swal.fire({
-                            title: 'Algunos productos no tenían stock suficiente',
-                            text: 'Se han excluido del pedido.',
-                            icon: 'warning'
+                            title: 'Compra realizada con éxito',
+                            text: `Código del ticket: ${data.ticket.code}`,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        if (data.unprocessedProducts.length > 0) {
+                            Swal.fire({
+                                title: 'Algunos productos no tenían stock suficiente',
+                                text: 'Se han excluido del pedido. Puedes intentar comprar nuevamente.',
+                                icon: 'warning'
+                            });
+
+                            // Si quedaron productos sin stock, recargar la página para intentar otra compra
+                            setTimeout(() => location.reload(), 2500);
+                        } else {
+                            // Si se compró todo el carrito, redirigir a /api/products
+                            setTimeout(() => window.location.href = "/api/products", 2500);
+                        }
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo procesar la compra',
+                            icon: 'error'
                         });
                     }
-
-                    setTimeout(() => location.reload(), 2500);
-                } else {
+                })
+                .catch(error => {
+                    console.error('Error en la compra:', error);
                     Swal.fire({
                         title: 'Error',
-                        text: 'No se pudo procesar la compra',
+                        text: 'Hubo un problema al procesar la compra',
                         icon: 'error'
                     });
-                }
-            })
-            .catch(error => {
-                console.error('Error en la compra:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Hubo un problema al procesar la compra',
-                    icon: 'error'
                 });
-            });
         }
     </script>
 </body>

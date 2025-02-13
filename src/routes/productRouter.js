@@ -13,7 +13,6 @@ router.get('/', async (req, res) => {
         limit = parseInt(limit);
         page = parseInt(page);
 
-        // Construir parámetros de consulta alineados con WebSockets
         const params = {
             limit,
             page,
@@ -22,6 +21,13 @@ router.get('/', async (req, res) => {
         };
 
         const result = await productDB.getAllProducts(params);
+        const rawCategories = await productDB.getUniqueCategories();
+
+        // Formatear las categorías con información sobre si están seleccionadas
+        const categories = rawCategories.map(cat => ({
+            name: cat,
+            isSelected: cat === category
+        }));
 
         res.render('products', {
             title: 'Productos',
@@ -34,8 +40,10 @@ router.get('/', async (req, res) => {
             limit,
             isSession: !!req.session.user,
             isAdmin: req.session.user && req.session.user.role === 'admin',
-            sortBy: sort,   // Pasar ordenamiento a Handlebars
-            sortOrder       // Pasar dirección de ordenamiento a Handlebars
+            sortBy: sort,
+            sortOrder,
+            categories, // Enviar las categorías formateadas
+            selectedCategory: category // Pasar la categoría seleccionada
         });
 
     } catch (err) {
